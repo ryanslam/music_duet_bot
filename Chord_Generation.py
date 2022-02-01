@@ -1,4 +1,3 @@
-from pickletools import markobject
 import csv
 from typing import KeysView
 import numpy as np
@@ -16,7 +15,7 @@ class Chord_Generator:
     def __init__(self, chord=[], begin=True, corpus=[], seed=None):
         self.chord=chord
         self.begin=True
-        self.corpus=corpus.to_numpy()
+        self.corpus=corpus
         self.bigrams=[]
         self.chords=chord
         self.seed = seed
@@ -47,7 +46,7 @@ class Chord_Generator:
             prob = [.15, .15, .7]
         return (chord, prob)
 
-    def generate_chord_progression(self, bars=2):
+    def generate_chord_progression(self, bars=8):
         temp_name = []
         temp_chord = []
         chord_name_arr = []
@@ -57,7 +56,7 @@ class Chord_Generator:
             if i == 0:
                 chord = options
             else:
-                print(options, prob)
+                # print(options, prob)
                 chord = np.random.choice(options, p=prob)
             temp_chord.append(chord)
             
@@ -77,9 +76,9 @@ class Chord_Generator:
             # print(i)
             chord_name_arr.append(temp_name[i])
             chord_matrix.append(temp_chord[i])
-            print(chord_matrix)
-        print(chord_name_arr)
-        print(chord_matrix)
+        #     print(chord_matrix)
+        # print(chord_name_arr)
+        # print(chord_matrix)
         return (chord_name_arr, chord_matrix)
 
     # Generates the bigrams of the chords given a chord csv.
@@ -119,7 +118,7 @@ class Chord_Generator:
         midi_data = pretty_midi.PrettyMIDI()
         piano_program = pretty_midi.instrument_name_to_program('Acoustic Grand Piano')
         piano = pretty_midi.Instrument(program=piano_program)
-        length = 1
+        length = 4
         vol = 100
         
         chord_prog = [Chord(c) for c in chord_prog]
@@ -129,10 +128,10 @@ class Chord_Generator:
                 vol = 0
             else:
                 vol = 100
-            print(chord)
+            # print(chord)
             for note_name in chord.components_with_pitch(root_pitch=4):
                 note_number = pretty_midi.note_name_to_number(note_name)
-                note = pretty_midi.Note(velocity=vol, pitch=note_number, start=n, end=(n + .25) * length)
+                note = pretty_midi.Note(velocity=vol, pitch=note_number, start=n*length, end=(n + 1) * length)
                 
                 piano.notes.append(note)
         midi_data.instruments.append(piano)
@@ -176,9 +175,10 @@ chords = {
         "IV"     : ('F', ['F', 'A', 'C']),
         "V"     : ('G', ['G', 'B', 'D']),
     }
-cg = Chord_Generator(corpus=df['chords'], chord=chords)
+cg = Chord_Generator(corpus=None, chord=chords, seed=1)
 name, matrix = cg.generate_chord_progression()
 print(name)
+print(matrix)
 cg.convert_to_midi(name)
 # cg.generate_chord_from_melody('/Users/ryanshiaulam/Desktop/College/scu_grad_yr_one_RSL/Winter/COEN_219/music_duet_bot/Midi_outputs/chord.mid')
 # cg.create_new_data()    
@@ -186,25 +186,25 @@ cg.convert_to_midi(name)
 # print(arr)
 # cg.convert_to_midi()
 
-def play_music(midi_filename):
-        '''Stream music_file in a blocking manner'''
-        clock = pygame.time.Clock()
-        pygame.mixer.music.load(midi_filename)
-        pygame.mixer.music.play()
-        while pygame.mixer.music.get_busy():
-            clock.tick(30) # check if playback has finished
+# def play_music(midi_filename):
+#         '''Stream music_file in a blocking manner'''
+#         clock = pygame.time.Clock()
+#         pygame.mixer.music.load(midi_filename)
+#         pygame.mixer.music.play()
+#         while pygame.mixer.music.get_busy():
+#             clock.tick(30) # check if playback has finished
 
-freq = 44100  # audio CD quality
-bitsize = -16   # unsigned 16 bit
-channels = 2  # 1 is mono, 2 is stereo
-buffer = 1024   # number of samples
-pygame.mixer.init(freq, bitsize, channels, buffer)
-try:
-  # use the midi file you just saved
-  play_music('/Users/ryanshiaulam/Desktop/College/scu_grad_yr_one_RSL/Winter/COEN_219/music_duet_bot/Midi_outputs/chord.mid')
-except KeyboardInterrupt:
-  # if user hits Ctrl/C then exit
-  # (works only in console mode)
-  pygame.mixer.music.fadeout(1000)
-  pygame.mixer.music.stop()
-  raise SystemExit
+# freq = 44100  # audio CD quality
+# bitsize = -16   # unsigned 16 bit
+# channels = 2  # 1 is mono, 2 is stereo
+# buffer = 1024   # number of samples
+# pygame.mixer.init(freq, bitsize, channels, buffer)
+# try:
+#   # use the midi file you just saved
+#   play_music('/Users/ryanshiaulam/Desktop/College/scu_grad_yr_one_RSL/Winter/COEN_219/music_duet_bot/Midi_outputs/chord.mid')
+# except KeyboardInterrupt:
+#   # if user hits Ctrl/C then exit
+#   # (works only in console mode)
+#   pygame.mixer.music.fadeout(1000)
+#   pygame.mixer.music.stop()
+#   raise SystemExit
