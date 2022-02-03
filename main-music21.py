@@ -7,46 +7,71 @@
 
 from music21 import midi, pitch, corpus, stream
 import time
+import keyboard
 
 from mido import MidiFile
 # from chordgeneration import convert # Ryan's file
 # import bassGenerator # Juhan's file
-from pauls_melody import Paul_melody
+# from pauls_melody import Paul_melody
+from Chord_Generation import Chord_Generator
 
 
 generatedmusic = stream.Stream()
 
 
 def main():
-    bpm = 120
-    beats = 4
-    measures = 6
-    music_file = '8bars.midi'
-    sleep_duration = (60.0/bpm)*(measures*beats)
-    measures_played = 0
 
-    generate()
-    mf = midi.MidiFile()
-    mf.open(music_file)
-    mf.read()
-    mf.close()
-    s = midi.translate.midiFileToStream(mf)
-    sp = midi.realtime.StreamPlayer(s)
+    chords = {
+        "I"     : ('C', ['C', 'E', 'G']),
+        "vi"     : ('Am', ['A', 'C', 'E']),
+        "IV"     : ('F', ['F', 'A', 'C']),
+        "V"     : ('G', ['G', 'B', 'D']),
+    }
 
+    cg = Chord_Generator(corpus=None, chord=chords, seed=1)
+    
     while True:
-        sp.play(blocked=False)
-        start_time = time.time()
-        print("current measure {}".format(measures_played))
-        measures_played += measures
-        generate()
-        mf = midi.MidiFile()
-        mf.open(music_file)
-        mf.read()
-        mf.close()
-        s = midi.translate.midiFileToStream(mf)
-        time.sleep(sleep_duration + start_time - time.time())
-        sp.stop()
+        try:
+            # Ends the loop.
+            if keyboard.is_pressed('escape'):
+                break
+        except:
+            break
 
+        # Ryan's Part
+        name, matrix = cg.generate_chord_progression()
+        length = cg.convert_to_midi(name)
+        print(name, matrix, length)
+
+
+    # bpm = 120
+    # beats = 4
+    # measures = 6
+    # music_file = '8bars.midi'
+    # sleep_duration = (60.0/bpm)*(measures*beats)
+    # measures_played = 0
+
+    # generate()
+    # mf = midi.MidiFile()
+    # mf.open(music_file)
+    # mf.read()
+    # mf.close()
+    # s = midi.translate.midiFileToStream(mf)
+    # sp = midi.realtime.StreamPlayer(s)
+
+    # while True:
+    #     sp.play(blocked=False)
+    #     start_time = time.time()
+    #     print("current measure {}".format(measures_played))
+    #     measures_played += measures
+    #     generate()
+    #     mf = midi.MidiFile()
+    #     mf.open(music_file)
+    #     mf.read()
+    #     mf.close()
+    #     s = midi.translate.midiFileToStream(mf)
+    #     time.sleep(sleep_duration + start_time - time.time())
+    #     sp.stop()
 
 def generate():
     # call functions
@@ -63,20 +88,10 @@ def generate():
 
     cv1.save('8bars.midi')
 
-
 def Ryan_chord():
     print("Ryan")
-    # chords = {
-    #     "I"     : ('C', ['C', 'E', 'G']),
-    #     "vi"     : ('Am', ['A', 'C', 'E']),
-    #     "IV"     : ('F', ['F', 'A', 'C']),
-    #     "V"     : ('G', ['G', 'B', 'D']),
-    # }
-    # cg = Chord_Generator(corpus=None, chord=chords)
-    # name, matrix = cg.generate_chord_progression()
-    # print(name)
-    # cg.convert_to_midi(name)
-    # return name
+    
+    # return name, matrix, length
 
 
 def Junhan_bass():
@@ -86,7 +101,6 @@ def Junhan_bass():
 
 def Paul_meoldy():
     print('Paul')
-
 
 if __name__ == '__main__':
     main()

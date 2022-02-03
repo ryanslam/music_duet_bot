@@ -1,4 +1,3 @@
-import csv
 from typing import KeysView
 import numpy as np
 import pandas as pd
@@ -46,7 +45,7 @@ class Chord_Generator:
             prob = [.15, .15, .7]
         return (chord, prob)
 
-    def generate_chord_progression(self, bars=8):
+    def generate_chord_progression(self, bars=2):
         temp_name = []
         temp_chord = []
         chord_name_arr = []
@@ -56,7 +55,6 @@ class Chord_Generator:
             if i == 0:
                 chord = options
             else:
-                # print(options, prob)
                 chord = np.random.choice(options, p=prob)
             temp_chord.append(chord)
             
@@ -67,18 +65,9 @@ class Chord_Generator:
             temp_name.append(name)
             temp_chord[i] = chord
 
-        
-        for i in range(len(temp_chord)):
-            # print(len(temp_name))
-            # if i%2 == 0 and not(i == 0):
-            #     chord_name_arr.append('Fm')
-            #     chord_matrix.append('.')
-            # print(i)
             chord_name_arr.append(temp_name[i])
             chord_matrix.append(temp_chord[i])
-        #     print(chord_matrix)
-        # print(chord_name_arr)
-        # print(chord_matrix)
+
         return (chord_name_arr, chord_matrix)
 
     # Generates the bigrams of the chords given a chord csv.
@@ -94,7 +83,6 @@ class Chord_Generator:
         bigrams = self.generate_bigrams()
         for chord in range(len(bigrams)):
             bigrams[chord] = re.sub(".+? ", "", bigrams[chord])
-        # print(bigrams)
         vectorizer = CountVectorizer(lowercase=False, token_pattern='\\b\\w+\\-*\\#*\\d*\\w*\\d*\\b')
         freq = vectorizer.fit_transform(bigrams).sum(axis=0)
         freq = np.squeeze(np.asarray(freq))
@@ -118,17 +106,11 @@ class Chord_Generator:
         midi_data = pretty_midi.PrettyMIDI()
         piano_program = pretty_midi.instrument_name_to_program('Acoustic Grand Piano')
         piano = pretty_midi.Instrument(program=piano_program)
-        length = 4
+        length = 2
         vol = 100
         
         chord_prog = [Chord(c) for c in chord_prog]
-        print(len(chord_prog))
         for n, chord in enumerate(chord_prog):
-            if str(chord) == 'Fm':
-                vol = 0
-            else:
-                vol = 100
-            # print(chord)
             for note_name in chord.components_with_pitch(root_pitch=4):
                 note_number = pretty_midi.note_name_to_number(note_name)
                 note = pretty_midi.Note(velocity=vol, pitch=note_number, start=n*length, end=(n + 1) * length)
@@ -137,7 +119,7 @@ class Chord_Generator:
         midi_data.instruments.append(piano)
         midi_data.write('Midi_outputs/chord.mid')
 
-        return
+        return len(chord_prog)
 
     # Takes in an input MIDI and extracts the note names.
     def generate_chord_from_melody(self, midi):
@@ -169,30 +151,25 @@ df = pd.read_csv('chord_generation_data/chords.csv')
 
 
 
-chords = {
-        "I"     : ('C', ['C', 'E', 'G']),
-        "vi"     : ('Am', ['A', 'C', 'E']),
-        "IV"     : ('F', ['F', 'A', 'C']),
-        "V"     : ('G', ['G', 'B', 'D']),
-    }
-cg = Chord_Generator(corpus=None, chord=chords, seed=1)
-name, matrix = cg.generate_chord_progression()
-print(name)
-print(matrix)
-cg.convert_to_midi(name)
-# cg.generate_chord_from_melody('/Users/ryanshiaulam/Desktop/College/scu_grad_yr_one_RSL/Winter/COEN_219/music_duet_bot/Midi_outputs/chord.mid')
-# cg.create_new_data()    
-# arr = cg.generate_chord()
-# print(arr)
-# cg.convert_to_midi()
+# chords = {
+#         "I"     : ('C', ['C', 'E', 'G']),
+#         "vi"     : ('Am', ['A', 'C', 'E']),
+#         "IV"     : ('F', ['F', 'A', 'C']),
+#         "V"     : ('G', ['G', 'B', 'D']),
+#     }
+# cg = Chord_Generator(corpus=None, chord=chords, seed=1)
+# name, matrix = cg.generate_chord_progression()
+# print(name)
+# print(matrix)
+# cg.convert_to_midi(name)
 
-# def play_music(midi_filename):
-#         '''Stream music_file in a blocking manner'''
-#         clock = pygame.time.Clock()
-#         pygame.mixer.music.load(midi_filename)
-#         pygame.mixer.music.play()
-#         while pygame.mixer.music.get_busy():
-#             clock.tick(30) # check if playback has finished
+def play_music(midi_filename):
+        '''Stream music_file in a blocking manner'''
+        clock = pygame.time.Clock()
+        pygame.mixer.music.load(midi_filename)
+        pygame.mixer.music.play()
+        while pygame.mixer.music.get_busy():
+            clock.tick(30) # check if playback has finished
 
 # freq = 44100  # audio CD quality
 # bitsize = -16   # unsigned 16 bit
