@@ -37,8 +37,6 @@ class BassNoteGenerator:
 class BassGenerator:
 
     def __init__(self):
-        # self.bassline = [[0, -5, -2, 0, -2, -5, -7, -5],
-        #                  [0, 0, 0, 0, -5, -5, -5, -5]]
         self.rythms = [[1, 1, 2, 1, 1, 1, 1],
                        [1, 1, 2, 1, 2, 1], [1, 2, 1, 1, 1, 1, 1], [
                            1, 1, 1, 1, 1, 1, 1, 1], [3, 1, 3, 1], [2, 1, 2, 1], [3, 3, 1, 1], [3, 3, 2]
@@ -49,9 +47,11 @@ class BassGenerator:
         second = random.choice(self.rythms)
         return [first, second]
 
-    def get_note(self, ps, time):
+    def get_note(self, ps, time, vol):
         _note = note.Note(ps)
         _note.duration = duration.Duration(time)
+        _note.volume = vol
+        print(_note.volume)
         return _note
 
     def alter_note_ps(self, ps):
@@ -67,8 +67,11 @@ class BassGenerator:
         notes = []
         for dur in rythm:
             bass_note_generator.generate(root_note_ps)
-            notes.append(self.get_note(bass_note_generator.generate(root_note_ps),
-                                       chord_duration/8*dur))
+            volume_velocity = random.randrange(40, 120)
+            note_ps = bass_note_generator.generate(root_note_ps)
+            note_dur = chord_duration/8*dur
+            notes.append(self.get_note(
+                note_ps, note_dur, volume_velocity))
         return notes
 
     def generate(self, imputMidiPath, outputMidiPath):
@@ -98,13 +101,13 @@ class BassGenerator:
         # bassPart.append(bar.Barline('final'))
 
         musicStream.insert(0, bassPart)
-        musicStream.write('midi', 'bass.mid')
+        musicStream.write('midi', outputMidiPath)
 
         return musicStream
 
 
 generator = BassGenerator()
 
-music_stream = generator.generate('chord.mid', '')
+music_stream = generator.generate('chord.mid', 'bass.mid')
 
 music_stream.show()
