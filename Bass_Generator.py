@@ -51,7 +51,6 @@ class BassGenerator:
         _note = note.Note(ps)
         _note.duration = duration.Duration(time)
         _note.volume = vol
-        print(_note.volume)
         return _note
 
     def alter_note_ps(self, ps):
