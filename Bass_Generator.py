@@ -66,7 +66,7 @@ class BassGenerator:
         notes = []
         for dur in rythm:
             bass_note_generator.generate(root_note_ps)
-            volume_velocity = random.randrange(40, 120)
+            volume_velocity = random.randrange(60, 120)
             note_ps = bass_note_generator.generate(root_note_ps)
             note_dur = chord_duration/8*dur
             notes.append(self.get_note(
@@ -105,8 +105,8 @@ class BassGenerator:
         return musicStream
 
 
-generator = BassGenerator()
+# generator = BassGenerator()
 
-music_stream = generator.generate('chord.mid', 'bass.mid')
+# music_stream = generator.generate('Midi_outputs/chord.mid', 'bass.mid')
 
-music_stream.show()
+# music_stream.show()
