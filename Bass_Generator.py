@@ -1,3 +1,11 @@
+# Author: Junhan Deng
+# CSCI 291: Computational Creativity
+# Music Improvisor Project
+# Date: 2022 Feb 4
+# File description:
+#   Generate Bassline based on a markov chain and combination of rythms preset.
+
+
 from music21 import *
 import random
 
