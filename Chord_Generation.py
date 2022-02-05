@@ -1,3 +1,8 @@
+# Ryan's portion of the code.
+# 2/4/2022
+# Constructs the chord progression used in the trio.
+
+
 from typing import KeysView
 import numpy as np
 import pandas as pd
